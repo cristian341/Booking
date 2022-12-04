@@ -47,17 +47,31 @@ class Booking(QtWidgets.QMainWindow):
         self.btnGoldPackage.setAutoExclusive(True)
        
     def btn_hireCost(self):
-        btnList = [[self.btnSaloon,22.50],[self.btnHP,28.00],[self.btnVan,35.00]]
-        if self.btnSaloon.isChecked() or self.btnHP.isChecked() or self.btnVan.isChecked() and self.dayList.value():
-            for i in range(3):
-                if btnList[i][0].isChecked():
-                    self.selectLabel.setText(f"The total cost for {self.dayList.value()} days will be £{btnList[i][1]*self.dayList.value():.2f}")
-                    self.selectLabel.adjustSize()
-                
+        self.validation_checkup()
+
             
+    def validation_checkup(self):
+        #btnList = [[self.btnSaloon,22.50],[self.btnHP,28.00],[self.btnVan,35.00]]
+        vehicleType = self.check_clicked(self.btnSaloon,self.btnHP,self.btnVan,label=self.vehicleType)
+        insuranceCover = self.check_clicked(self.btnInsuranceYes,self.btnInsuranceNo,label=self.insuranceCover)
+        typeCustomer = self.check_clicked(self.btnCustomerNew,self.btnCustomerExisting,label=self.customerType)
+        if self.btnCustomerExisting.isChecked():
+            loyaltyCard = self.check_clicked(self.btnBronzePackage,self.btnSilverPackage,self.btnGoldPackage,label=self.loyaltyCardType)
         
+    def check_clicked(self,*args,label=None):
+        """Funtion that checks if any of the buttons from the input is checked, if not the label will change its colour in red."""
+        arg_list = [*args]
+        checked = False
+        label.setStyleSheet("color:black;")
+        for element in arg_list:
+            if element.isChecked():
+                checked = True
+        if checked == True:
+            return True
         else:
-            self.selectLabel.setText("Error")
+            label.setStyleSheet("color:red;")
+                
+        
     def btn_reset(self):
         #Resets the window to the default values
         self.btnSaloon.setAutoExclusive(False)
@@ -105,7 +119,11 @@ class Booking(QtWidgets.QMainWindow):
         self.btnGoldPackage.setAutoExclusive(False)
         self.btnGoldPackage.setChecked(False)
         self.btnGoldPackage.setAutoExclusive(True)
-    
+        #setting the text to the default values
+        self.vehicleType.setStyleSheet("color:black")
+        self.insuranceCover.setStyleSheet("color:black")
+        self.customerType.setStyleSheet("color:black")
+        self.loyaltyCardType.setStyleSheet("color:black")
         self.selectLabel.setText("Select")
 
     
