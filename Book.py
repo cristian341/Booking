@@ -22,7 +22,7 @@ class Booking(QtWidgets.QMainWindow):
         
         
     def btnExistingCustomer(self):
-        #set the buttons to be enabled
+        "set the buttons to be enabled"
         self.btnBronzePackage.setEnabled(True)
         self.btnBronzePackage.setAutoExclusive(True)
         self.btnSilverPackage.setEnabled(True)
@@ -31,11 +31,11 @@ class Booking(QtWidgets.QMainWindow):
         self.btnGoldPackage.setAutoExclusive(True)
         
     def btnNewCustomer(self):
-        #make the buttons to be unenables
+        "make the buttons to be unenables"
         self.btnBronzePackage.setEnabled(False)
         self.btnSilverPackage.setEnabled(False)
         self.btnGoldPackage.setEnabled(False)
-        #make the buttons to not have any values
+        "make the buttons to not have any values"
         self.btnBronzePackage.setAutoExclusive(False)
         self.btnBronzePackage.setChecked(False)
         self.btnBronzePackage.setAutoExclusive(True)
@@ -49,44 +49,36 @@ class Booking(QtWidgets.QMainWindow):
         self.btnGoldPackage.setAutoExclusive(True)
        
     def btn_hireCost(self):
-        val = self.validation_checkup()
-        #self.Customers.setCurrentWidget()
-        if val:
+        """Geting the information which button was pressed"""
+        if self.validation_checkup():
             self.Header.setCurrentWidget(self.Customers)
-
-    def simple(self):
-        if self.btnCustomerExisting.isChecked():
-            loyaltyCard = self.check_clicked(self.btnBronzePackage,self.btnSilverPackage,self.btnGoldPackage,label=self.loyaltyCardType)
-            if loyaltyCard:
-                return True
             
     def validation_checkup(self):
-        #btnList = [[self.btnSaloon,22.50],[self.btnHP,28.00],[self.btnVan,35.00]]
-        #geting the if the buttons are pressed
-        vehicleType = self.check_clicked(self.btnSaloon,self.btnHP,self.btnVan,label=self.vehicleType)
-        insuranceCover = self.check_clicked(self.btnInsuranceYes,self.btnInsuranceNo,label=self.insuranceCover)
-        typeCustomer = self.check_clicked(self.btnCustomerNew,self.btnCustomerExisting,label=self.customerType)
-        if self.btnCustomerExisting.isChecked():
-            loyaltyCard = self.check_clicked(self.btnBronzePackage,self.btnSilverPackage,self.btnGoldPackage,label=self.loyaltyCardType)
-            
-
+        "geting the if the buttons are pressed"
+        self.btnVehicle = self.check_clicked(self.btnSaloon,self.btnHP,self.btnVan,label=self.vehicleType)
+        self.btnInsurance = self.check_clicked(self.btnInsuranceYes,self.btnInsuranceNo,label=self.insuranceCover)
+        self.btnCustomer = self.check_clicked(self.btnCustomerNew,self.btnCustomerExisting,label=self.customerType)
         
+        if self.btnCustomerExisting.isChecked():
+            self.btnPackage = self.check_clicked(self.btnBronzePackage,self.btnSilverPackage,self.btnGoldPackage,label=self.loyaltyCardType)
+            if self.btnVehicle and self.btnInsurance and self.btnCustomer and self.btnPackage:
+                return True
+        elif self.btnCustomerNew.isChecked():
+            if self.btnVehicle and self.btnInsurance and self.btnCustomer:
+                return True
+            
+       
     def check_clicked(self,*args,label=None):
         """Funtion that checks if any of the buttons from the input is checked, if not the label will change its colour in red."""
         arg_list = [*args]
         checked = False
-        label.setStyleSheet("color:black;")
-        for i in range(len(arg_list)):
-            if arg_list[i].isChecked():
-                print(str(arg_list[i]))
+        label.setStyleSheet("color:black;")     
+        for element in arg_list:
+            if element.isChecked():
+                print(element.text())
                 checked = True
-                
-        # for element in arg_list:
-        #     if element.isChecked():
-        #         print(arg_list[element])
-        #         checked = True
         if checked == True:
-            return True
+            return element
         else:
             label.setStyleSheet("color:red;")
                 
