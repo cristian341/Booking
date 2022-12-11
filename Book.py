@@ -157,8 +157,8 @@ class Booking(QtWidgets.QMainWindow):
         self.carTypeLabel.setText(self.btnVehicle.text())
         self.carTypeLabel.adjustSize()
         
-        self.priceLabel.setText(f"£{self.costs[self.btnVehicle.text()]}")
-        self.priceLabel.adjustSize()
+        #self.carModelLabel.setText(self.)
+        #self.carModelLabel.adjustSize()
         
         self.daysLabel.setText(f"{self.dayList.value()}")
         self.daysLabel.adjustSize()
