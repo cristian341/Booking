@@ -559,7 +559,7 @@
      <widget class="QGroupBox" name="groupPackages">
       <property name="geometry">
        <rect>
-        <x>570</x>
+        <x>290</x>
         <y>280</y>
         <width>541</width>
         <height>181</height>
@@ -695,7 +695,7 @@
      <widget class="QGroupBox" name="groupResultButtons">
       <property name="geometry">
        <rect>
-        <x>570</x>
+        <x>290</x>
         <y>460</y>
         <width>541</width>
         <height>181</height>
@@ -838,7 +838,7 @@
         <rect>
          <x>30</x>
          <y>80</y>
-         <width>141</width>
+         <width>161</width>
          <height>31</height>
         </rect>
        </property>
@@ -846,7 +846,7 @@
         <string>Price Per Day</string>
        </property>
       </widget>
-      <widget class="QLabel" name="carModelLabel">
+      <widget class="QLabel" name="priceLabel">
        <property name="geometry">
         <rect>
          <x>270</x>
@@ -994,7 +994,7 @@
         <rect>
          <x>270</x>
          <y>380</y>
-         <width>121</width>
+         <width>151</width>
          <height>31</height>
         </rect>
        </property>
@@ -1027,24 +1027,6 @@
       </property>
       <property name="text">
        <string>Reset</string>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="HiredCars">
-     <attribute name="title">
-      <string>Hired Cars</string>
-     </attribute>
-     <widget class="QRadioButton" name="radioButton">
-      <property name="geometry">
-       <rect>
-        <x>270</x>
-        <y>240</y>
-        <width>201</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>RadioButton</string>
       </property>
      </widget>
     </widget>
