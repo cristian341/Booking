@@ -141,7 +141,7 @@ class Booking(QtWidgets.QMainWindow):
         self.loyaltyCardType.setStyleSheet("color:black")
 
         self.carTypeLabel.setText("")
-        self.priceLabel.setText("£0.00")
+        self.pricePerLabel.setText("£0.00")
         self.daysLabel.setText("")
         self.insuranceTypeLabel.setText("")
         self.customerTypeLabel.setText("")
@@ -157,8 +157,8 @@ class Booking(QtWidgets.QMainWindow):
         self.carTypeLabel.setText(self.btnVehicle.text())
         self.carTypeLabel.adjustSize()
         
-        #self.carModelLabel.setText(self.)
-        #self.carModelLabel.adjustSize()
+        self.pricePerLabel.setText(f"£{self.costs[self.btnVehicle.text()]:.2f}")
+        self.pricePerLabel.adjustSize()
         
         self.daysLabel.setText(f"{self.dayList.value()}")
         self.daysLabel.adjustSize()

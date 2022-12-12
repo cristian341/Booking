@@ -846,7 +846,7 @@
         <string>Price Per Day</string>
        </property>
       </widget>
-      <widget class="QLabel" name="priceLabel">
+      <widget class="QLabel" name="pricePerLabel">
        <property name="geometry">
         <rect>
          <x>270</x>
