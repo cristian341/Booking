@@ -4,23 +4,30 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import sys
 
-class Booking(QtWidgets.QMainWindow):
+class Quote(QtWidgets.QMainWindow):
     def __init__(self):
-        super(Booking,self).__init__()#call the inheritated classes __init__ method
-        uic.loadUi("Desing_1.ui",self)#Load the .ui file
+        super(Quote,self).__init__()#call the inheritated classes __init__ method
+        uic.loadUi("Design.ui",self)#Load the .ui file
         self.setWindowIcon(QtGui.QIcon(r"./images/leasing.png"))
         self.unitUI()
-        self.costs = {"Saloon":22.50,"High Performance":28.00,"Van":35.00}
         
     def unitUI(self):
-        self.Header.setCurrentWidget(self.Hire)
-        self.comboBoxHP.setPlaceholderText("Text")
+        """Getting the event driven object"""
+        self.Header.setCurrentWidget(self.QuoteCalculator)   
+        self.hiddenVariables()     
         self.hireCostBtn.clicked.connect(self.btn_hireCost)
         self.resetBtn.clicked.connect(self.btn_reset)
         self.btnCustomersReset.clicked.connect(self.btn_reset)
         self.btnCustomerNew.clicked.connect(self.btnNewCustomer)
         self.btnCustomerExisting.clicked.connect(self.btnExistingCustomer)
         
+    def hiddenVariables(self):
+        """Setting the hidden variables"""
+        self._costs = {"Saloon":22.50,"High Performance":28.00,"Van":35.00}
+        self._cover = 15.50
+        self._discount = 0.9
+        self._returnable = 50
+        self._promotionDiscount = 18.00
         
     def btnExistingCustomer(self):
         "set the buttons to be enabled"
@@ -48,24 +55,29 @@ class Booking(QtWidgets.QMainWindow):
         self.btnGoldPackage.setAutoExclusive(True)
        
     def btn_hireCost(self):
-        """Geting the information which button was pressed"""
+        """Quote Calculation main funtion"""
+        #If the validation is true, when it will precide with the quote calculation and quote displaying by calling textPrint()
         if self.validation_checkup():
-            self.Header.setCurrentWidget(self.Customers)
-            """Start the quote preparation"""
+            self.Header.setCurrentWidget(self.QuoteViewer)
+            
             self.textPrint()
-            discount, returnable, totalCost = self.calculationPrice()
+            discount, totalCost = self.calculationPrice()
             self.totalPriceLabel.setText(f"Total Price is £{totalCost:.2f}")
             self.totalPriceLabel.adjustSize()
             
             self.discountLabel.setText(f"{discount*100}%")
             self.discountLabel.adjustSize()
             
-            self.returnableLabel.setText(f"£{returnable}")
+            self.returnableLabel.setText(f"£{self._returnable}")
             self.returnableLabel.adjustSize()
+            
+            self.depositLabel.setText(f"£{self._returnable}")
+            self.depositLabel.adjustSize()
             
             
     def validation_checkup(self):
-        "geting the if the buttons are pressed"
+        """Its getting the button's label, which has been clicked"""
+        "Checkes if the required buttons had been pressed, to"
         self.btnVehicle = self.check_clicked(self.btnSaloon,self.btnHP,self.btnVan,label=self.vehicleType)
         self.btnInsurance = self.check_clicked(self.btnInsuranceYes,self.btnInsuranceNo,label=self.insuranceCover)
         self.btnCustomer = self.check_clicked(self.btnCustomerNew,self.btnCustomerExisting,label=self.customerType)
@@ -88,6 +100,7 @@ class Booking(QtWidgets.QMainWindow):
         label.setStyleSheet("color:red;")
         
     def btn_reset(self):
+        """Sets all the buttons/labals to default values."""
         #Resets the window to the default values
         self.btnSaloon.setAutoExclusive(False)
         self.btnSaloon.setChecked(False)
@@ -149,15 +162,19 @@ class Booking(QtWidgets.QMainWindow):
         self.discountLabel.setText("0%")
         self.returnableLabel.setText("£0.00")
         self.returnableLabel.adjustSize()
+        self.depositLabel.setText("£0.00")
+        self.depositLabel.adjustSize()
         self.totalPriceLabel.setText("Total Price is £0.00")
+        
+        self.Header.setCurrentWidget(self.QuoteCalculator)
         
         
     def textPrint(self):
-        
+        """Prints that button's text, that has been chose"""
         self.carTypeLabel.setText(self.btnVehicle.text())
         self.carTypeLabel.adjustSize()
         
-        self.pricePerLabel.setText(f"£{self.costs[self.btnVehicle.text()]:.2f}")
+        self.pricePerLabel.setText(f"£{self._costs[self.btnVehicle.text()]:.2f}")
         self.pricePerLabel.adjustSize()
         
         self.daysLabel.setText(f"{self.dayList.value()}")
@@ -173,165 +190,133 @@ class Booking(QtWidgets.QMainWindow):
         self.loyaltyTypeCard.adjustSize()
         
     def gettingLoyalty(self):
+        """Its getting the loyalty card type only if the customer is an existing customer, otherwise it will display none."""
         if self.btnCustomerExisting.isChecked():
             return self.btnPackage.text()
         else:
             return "None"
         
     def calculationPrice(self):
-        self.costs = {"Saloon":22.50,"High Performance":28.00,"Van":35.00}
-        cover = 0.00
-        discount = 0.00
-        returnable = 50
-        promotionDiscount = 0.00 
         
         if self.dayList.value() >= 7 and self.btnInsurance.text() == "Yes" and self.gettingLoyalty() == "Gold":
             if self.btnVehicle.text() == "Saloon":
-                discount = 0.9
-                cover = 15.50
-                totalCost = ((self.costs[self.btnVehicle.text()] * self.dayList.value()) + cover + returnable) * discount
+                totalCost = ((self._costs[self.btnVehicle.text()] * self.dayList.value()) + self._cover) * self._discount + self._returnable
                 print(1)
-                return 0.1, returnable, totalCost
+                return 0.1, totalCost
             elif self.btnVehicle.text() == "High Performance":
-                discount = 0.9
-                cover = 15.50
-                promotionDiscount = 18.00
-                totalCost = ((self.costs[self.btnVehicle.text()] * self.dayList.value()) + cover + returnable - promotionDiscount) * discount
+                totalCost = ((self._costs[self.btnVehicle.text()] * self.dayList.value()) + self._cover - self._promotionDiscount) * self._discount + self._returnable
                 print(2)
-                return 0.1, returnable, totalCost
+                return 0.1, totalCost
             elif self.btnVehicle.text() == "Van":
-                discount = 0.9
-                cover = 15.50
-                totalCost = (self.costs[self.btnVehicle.text()] * self.dayList.value() + cover + returnable) * discount
+                totalCost = (self._costs[self.btnVehicle.text()] * self.dayList.value() + self._cover) * self._discount + self._returnable
                 print(3)
-                return 0.1, returnable, totalCost
+                return 0.1, totalCost
             
         elif self.dayList.value() >= 7 and self.btnInsurance.text() == "Yes":
             if self.btnVehicle.text() == "Saloon":
-                discount = 0.9
-                cover = 15.50
-                totalCost = (self.costs[self.btnVehicle.text()] * self.dayList.value() + cover + returnable) * discount
+                totalCost = (self._costs[self.btnVehicle.text()] * self.dayList.value() + self._cover) * self._discount + self._returnable
                 print(4)
-                return 0.1, returnable, totalCost
+                return 0.1, totalCost
             elif self.btnVehicle.text() == "High Performance":
-                discount = 0.9
-                cover = 15.50
-                totalCost = (self.costs[self.btnVehicle.text()] * self.dayList.value() + cover + returnable) * discount
+                totalCost = (self._costs[self.btnVehicle.text()] * self.dayList.value() + self._cover) * self._discount + self._returnable
                 print(5)
-                return 0.1, returnable, totalCost
+                return 0.1, totalCost
             elif self.btnVehicle.text() == "Van":
-                discount = 0.9
-                cover = 15.50
-                totalCost = (self.costs[self.btnVehicle.text()] * self.dayList.value() + cover + returnable) * discount
+                totalCost = (self._costs[self.btnVehicle.text()] * self.dayList.value() + self._cover) * self._discount + self._returnable
                 print(6)
-                return 0.1, returnable, totalCost
+                return 0.1, totalCost
             
         elif self.dayList.value() >= 7 and self.gettingLoyalty() == "Gold":
             if self.btnVehicle.text() == "Saloon":
-                discount = 0.9
-                totalCost = (self.costs[self.btnVehicle.text()] * self.dayList.value() + returnable) * discount
+                totalCost = (self._costs[self.btnVehicle.text()] * self.dayList.value()) * self._discount + self._returnable
                 print(7)
-                return 0.1, returnable, totalCost
+                return 0.1, totalCost
             elif self.btnVehicle.text() == "High Performance":
-                discount = 0.9
-                promotionDiscount = 18.00
-                totalCost = (self.costs[self.btnVehicle.text()] * self.dayList.value() - promotionDiscount+ returnable) * discount
+                totalCost = (self._costs[self.btnVehicle.text()] * self.dayList.value() - self._promotionDiscount) * self._discount + self._returnable
                 print(8)
-                return 0.1, returnable, totalCost
+                return 0.1, totalCost
             elif self.btnVehicle.text() == "Van":
-                discount = 0.9
-                totalCost = (self.costs[self.btnVehicle.text()] * self.dayList.value() + returnable) * discount
+                totalCost = (self._costs[self.btnVehicle.text()] * self.dayList.value()) * self._discount + self._returnable
                 print(9)
-                return 0.1, returnable, totalCost
+                return 0.1, totalCost
             
         elif self.btnInsurance.text() == "Yes" and self.gettingLoyalty() == "Gold":
             if self.btnVehicle.text() == "Saloon":
-                cover = 15.50
-                totalCost = (self.costs[self.btnVehicle.text()] * self.dayList.value() + cover + returnable) 
+                totalCost = (self._costs[self.btnVehicle.text()] * self.dayList.value() + self._cover) + self._returnable
                 print(10)
-                return discount, returnable, totalCost
+                return 0, totalCost
             elif self.btnVehicle.text() == "High Performance":
-                cover = 15.50
-                promotionDiscount = 18.00
-                totalCost = (self.costs[self.btnVehicle.text()] * self.dayList.value() + cover - promotionDiscount + returnable)
+                totalCost = (self._costs[self.btnVehicle.text()] * self.dayList.value() + self._cover - self._promotionDiscount) + self._returnable
                 print(11)
-                return discount, returnable, totalCost
+                return 0, totalCost
             elif self.btnVehicle.text() == "Van":
-                discount = 0.9
-                totalCost = (self.costs[self.btnVehicle.text()] * self.dayList.value() + returnable)
+                totalCost = (self._costs[self.btnVehicle.text()] * self.dayList.value()) + self._cover + self._returnable
                 print(12)
-                return discount, returnable, totalCost
+                return 0, totalCost
             
         elif self.dayList.value() >= 7:
             if self.btnVehicle.text() == "Saloon":
-                discount = 0.9
-                totalCost = (self.costs[self.btnVehicle.text()] * self.dayList.value() + returnable) * discount
+                totalCost = (self._costs[self.btnVehicle.text()] * self.dayList.value()) * self._discount + self._returnable
                 print(13)
-                return 0.1, returnable, totalCost
+                return 0.1, totalCost
             elif self.btnVehicle.text() == "High Performance":
-                discount = 0.9
-                totalCost = (self.costs[self.btnVehicle.text()] * self.dayList.value() + returnable) * discount
+                totalCost = (self._costs[self.btnVehicle.text()] * self.dayList.value()) * self._discount + self._returnable
                 print(14)
-                return 0.1, returnable, totalCost
+                return 0.1, totalCost
             elif self.btnVehicle.text() == "Van":
-                discount = 0.9
-                totalCost = (self.costs[self.btnVehicle.text()] * self.dayList.value() + returnable) * discount
+                totalCost = (self._costs[self.btnVehicle.text()] * self.dayList.value()) * self._discount + self._returnable
                 print(15)
-                return 0.1, returnable, totalCost
+                return 0.1, totalCost
             
         elif self.btnInsurance.text() == "Yes":
             if self.btnVehicle.text() == "Saloon":
-                cover = 15.50
-                totalCost = (self.costs[self.btnVehicle.text()] * self.dayList.value() + cover + returnable)
+                totalCost = (self._costs[self.btnVehicle.text()] * self.dayList.value() + self._cover) + self._returnable
                 print(16)
-                return discount, returnable, totalCost
+                return 0, totalCost
             elif self.btnVehicle.text() == "High Performance":
-                cover = 15.50
-                totalCost = (self.costs[self.btnVehicle.text()] * self.dayList.value() + cover + returnable)
+                totalCost = (self._costs[self.btnVehicle.text()] * self.dayList.value() + self._cover) + self._returnable
                 print(17)
-                return discount, returnable, totalCost
+                return 0, totalCost
             elif self.btnVehicle.text() == "Van":
-                cover = 15.50
-                totalCost = (self.costs[self.btnVehicle.text()] * self.dayList.value() + cover + returnable) 
+                totalCost = (self._costs[self.btnVehicle.text()] * self.dayList.value() + self._cover) + self._returnable 
                 print(18)
-                return discount, returnable, totalCost
+                return 0, totalCost
             
         elif self.gettingLoyalty() == "Gold":
             if self.btnVehicle.text() == "Saloon":
-                promotionDiscount = 18.00
-                totalCost = (self.costs[self.btnVehicle.text()] * self.dayList.value() + cover - promotionDiscount + returnable)
+                totalCost = (self._costs[self.btnVehicle.text()] * self.dayList.value()) + self._returnable
                 print(19)
-                return discount, returnable, totalCost
+                return 0, totalCost
             elif self.btnVehicle.text() == "High Performance":
-                promotionDiscount = 18.00
-                totalCost = (self.costs[self.btnVehicle.text()] * self.dayList.value() + cover - promotionDiscount + returnable)
+                
+                totalCost = (self._costs[self.btnVehicle.text()] * self.dayList.value() - self._promotionDiscount) + self._returnable
                 print(19)
-                return discount, returnable, totalCost
+                return 0, totalCost
             elif self.btnVehicle.text() == "Van":
-                promotionDiscount = 18.00
-                totalCost = (self.costs[self.btnVehicle.text()] * self.dayList.value() + cover - promotionDiscount + returnable)
+                
+                totalCost = (self._costs[self.btnVehicle.text()] * self.dayList.value()) + self._returnable
                 print(20)
-                return discount, returnable, totalCost
+                return 0, totalCost
         
         elif self.btnInsurance.text() == "No":
             if self.btnVehicle.text() == "Saloon":
-                totalCost = (self.costs[self.btnVehicle.text()] * self.dayList.value() + cover + returnable)
+                totalCost = (self._costs[self.btnVehicle.text()] * self.dayList.value()) + self._returnable
                 print(21)
-                return discount, returnable, totalCost
+                return 0, totalCost
             elif self.btnVehicle.text() == "High Performance":
-                totalCost = (self.costs[self.btnVehicle.text()] * self.dayList.value() + cover + returnable)
+                totalCost = (self._costs[self.btnVehicle.text()] * self.dayList.value()) + self._returnable
                 print(22)
-                return discount, returnable, totalCost
+                return 0, totalCost
             elif self.btnVehicle.text() == "Van":
-                totalCost = (self.costs[self.btnVehicle.text()] * self.dayList.value() + cover + returnable)
+                totalCost = (self._costs[self.btnVehicle.text()] * self.dayList.value()) + self._returnable
                 print(23)
-                return discount, returnable, totalCost
+                return 0, totalCost
             
         
         
 if __name__ == "__main__":      
     app = QtWidgets.QApplication(sys.argv)
-    booking = Booking()
-    booking.show()
+    quote = Quote()
+    quote.show()
     app.exec_()
  
